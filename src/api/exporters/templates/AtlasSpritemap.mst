@@ -1,0 +1,18 @@
+{"ATLAS": {"SPRITES":[
+	{{#rects}}
+	{{#rotated}}
+	{"SPRITE" : {"name": "{{{name}}}","x":{{frame.x}},"y":{{frame.y}},"w":{{frame.h}},"h":{{frame.w}},"rotated": true}}{{^last}},{{/last}}
+	{{/rotated}}{{^rotated}}
+	{"SPRITE" : {"name": "{{{name}}}","x":{{frame.x}},"y":{{frame.y}},"w":{{frame.w}},"h":{{frame.h}},"rotated": false}}{{^last}},{{/last}}
+	{{/rotated}}
+	{{/rects}}
+]},
+"meta": {
+"app": "{{{appInfo.displayName}}}",
+"version": "{{appInfo.version}}",
+"image": "{{^config.base64Export}}{{config.imageFile}}{{/config.base64Export}}{{#config.base64Export}}{{{config.base64Prefix}}}{{{config.imageData}}}{{/config.base64Export}}",
+"format": "{{config.format}}",
+"size": {"w":{{config.imageWidth}},"h":{{config.imageHeight}}},
+"resolution": "1"
+}
+}

@@ -1,0 +1,66 @@
+import type { Rect } from 'api/types';
+import Splitter from './Splitter';
+
+class Grid extends Splitter {
+	override doCheck(data: string, cb: (checked: boolean) => void) {
+		cb(false);
+	}
+
+	override doSplit(data: string, cb: (res: Rect[] | false) => void) {
+		const res:Rect[] = [];
+
+		const fw = (this.options.width + this.options.padding * 2);
+		const fh = (this.options.height + this.options.padding * 2);
+
+		const cols = Math.floor(this.options.textureWidth / fw);
+		const rows = Math.floor(this.options.textureHeight / fh);
+
+		const nc = (cols * rows) + '';
+
+		let ix = 0;
+		for(let y=0; y<rows; y++) {
+			for(let x=0; x<cols; x++) {
+				let name = ix + '';
+				while(name.length < nc.length) name = '0' + name;
+
+				res.push({
+					name: Splitter.fixFileName(name),
+					frame: {
+						x: x * fw + this.options.padding,
+						y: y * fh + this.options.padding,
+						w: this.options.width,
+						h: this.options.height
+					},
+					spriteSourceSize: {
+						x: 0,
+						y: 0,
+						w: this.options.width,
+						h: this.options.height
+					},
+					sourceSize: {
+						w: this.options.width,
+						h: this.options.height
+					},
+					frameSize: {
+						x: 0,
+						y: 0,
+						w: this.options.width,
+						h: this.options.height
+					},
+					trimmed: false,
+					rotated: false
+				});
+
+				ix++;
+			}
+		}
+
+		cb(res);
+	}
+
+	override get splitterName() {
+		return 'Grid';
+	}
+}
+
+export default Grid;

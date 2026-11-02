@@ -1,0 +1,63 @@
+{
+	"name": "heroic-packer",
+	"displayName": "Heroic Packer",
+	"version": "0.1.5",
+	"description": "Sprite sheet and texture atlas packer for Friday Night Funkin' mods and other 2D games",
+	"type": "module",
+	"private": true,
+	"author": "HeroEyad",
+	"license": "MIT",
+	"url": "https://heroicpacker.heroeyad.dev/",
+	"homepage": "https://github.com/HeroEyad/HeroicPacker",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/HeroEyad/HeroicPacker.git"
+	},
+	"bugs": {
+		"url": "https://github.com/HeroEyad/HeroicPacker/issues"
+	},
+	"keywords": [
+		"texture-packer",
+		"sprite-sheet",
+		"texture-atlas",
+		"sparrow",
+		"friday-night-funkin",
+		"fnf"
+	],
+	"scripts": {
+		"start": "webpack serve",
+		"build": "webpack --mode production"
+	},
+	"dependencies": {
+		"@jsquash/oxipng": "^2.3.0",
+		"@jvitela/mustache-wax": "^1.0.4",
+		"buffer": "^6.0.3",
+		"core-js": "^3.39.0",
+		"eventemitter3": "^5.0.1",
+		"file-saver": "^2.0.0",
+		"jszip": "^3.10.1",
+		"maxrects-packer": "^2.7.3",
+		"mustache": "^4.2.0",
+		"plist": "^3.1.0",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"stream": "^0.0.3",
+		"timers": "^0.1.1",
+		"xml2js": "^0.6.2"
+	},
+	"devDependencies": {
+		"@types/file-saver": "^2.0.7",
+		"@types/plist": "^3.0.5",
+		"@types/react": "^19.0.1",
+		"@types/react-dom": "^19.0.2",
+		"@types/xml2js": "^0.4.2",
+		"copy-webpack-plugin": "^12.0.2",
+		"raw-loader": "^4.0.2",
+		"ts-loader": "^9.5.1",
+		"typescript": "^5.7.2",
+		"webpack": "^5.97.1",
+		"webpack-cli": "^5.1.4",
+		"webpack-dev-server": "^5.2.0"
+	},
+	"packageManager": "yarn@1.22.22"
+}

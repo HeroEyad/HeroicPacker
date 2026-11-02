@@ -1,0 +1,117 @@
+html[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+html[data-theme="light"] {
+	color-scheme: light;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+	background-color: #161616;
+}
+
+html[data-theme="dark"] .color-900,
+html[data-theme="dark"] .color-black {
+	color: #e3e3e3;
+}
+
+html[data-theme="dark"] .color-800 {
+	color: #8ab4f8;
+}
+
+html[data-theme="dark"] .back-white {
+	background-color: #202020;
+}
+
+html[data-theme="dark"] .back-900 {
+	background-color: #0e0e0e;
+}
+
+html[data-theme="dark"] .back-400 {
+	background-color: #424242;
+}
+
+html[data-theme="dark"] .border-color-gray {
+	border-color: rgba(255, 255, 255, 0.16);
+}
+
+html[data-theme="dark"] .images-list,
+html[data-theme="dark"] .props-list {
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] .results-view-wrapper {
+	box-shadow: 1px 0 0 0 rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] .results-view-footer {
+	box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] .images-controllers hr,
+html[data-theme="dark"] .results-view-footer hr {
+	color: rgba(255, 255, 255, 0.14);
+	background-color: rgba(255, 255, 255, 0.14);
+}
+
+html[data-theme="dark"] .image-drop-help {
+	color: #a9a9a9;
+	background: #282828;
+	border-color: #3d3d3d;
+}
+
+html[data-theme="dark"] .image-drop-help.selected {
+	background: #323232;
+}
+
+html[data-theme="dark"] .image-list-item-current {
+	border-color: #d4d4d4;
+}
+
+html[data-theme="dark"] .image-list-image-container {
+	border-color: #4a4a4a;
+}
+
+html[data-theme="dark"] .results-view-footer .btn-back-color,
+html[data-theme="dark"] .sheet-splitter-bottom .btn-back-color {
+	border-color: #5a5a5a;
+}
+
+html[data-theme="dark"] .results-view-footer .btn-back-color.selected,
+html[data-theme="dark"] .sheet-splitter-bottom .btn-back-color.selected {
+	border-color: #c8c8c8;
+}
+
+html[data-theme="dark"] .grid-back {
+	background: repeating-conic-gradient(#3a3a3a 0% 25%, #2c2c2c 0% 50%) 0 0 / 14px 14px;
+}
+
+html[data-theme="dark"] .message-box-window,
+html[data-theme="dark"] .old-browser-content,
+html[data-theme="dark"] .edit-custom-exporter-content,
+html[data-theme="dark"] .sheet-splitter-content {
+	background: #262626;
+	border-color: #3a3a3a;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="dark"] .message-box-wrapper,
+html[data-theme="dark"] .processing-overlay,
+html[data-theme="dark"] .old-browser-overlay,
+html[data-theme="dark"] .edit-custom-exporter-overlay,
+html[data-theme="dark"] .sheet-splitter-overlay {
+	background-color: rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="dark"] .sheet-splitter-view {
+	border-color: #555;
+}
+
+html[data-theme="dark"] .sheet-splitter-view canvas {
+	border-color: #777;
+}
+
+html[data-theme="dark"] .player-window {
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+}

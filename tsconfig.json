@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"target": "es2016",
+		"lib": ["ESNext", "DOM"],
+		"jsx": "react-jsx",
+		"moduleResolution": "Node10",
+		"baseUrl": "./src",
+		"paths": {
+			"api/*": ["api/*"],
+			"client/*": ["client/*"],
+			"*": ["client/*"]
+		},
+		"strict": true,
+		"strictNullChecks": false,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"sourceMap": true
+	},
+	"include": ["src", "@types"]
+}
