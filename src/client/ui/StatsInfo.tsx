@@ -7,8 +7,11 @@ import TypedObserver from 'TypedObserver';
 import { formatBytes } from 'api/utils/common';
 import type { PackerCombo } from 'api/packers/Packer';
 import { getSpaceUsage } from 'api/utils/SpaceUsage';
-import { animationLabel } from 'api/utils/Character';
+import { animationLabel, groupFrames, type AnimationGroup } from 'api/utils/Character';
+import { findPrefixClashes, renameClashes, type PrefixClash } from 'api/utils/PrefixClash';
+import { exportedName } from 'api/exporters';
 import APP from 'client/APP';
+import ImagesList from './ImagesList';
 import type { RepackCheckResult } from 'client/utils/RepackChecker';
 
 (globalThis as any).formatBytes = formatBytes;
@@ -21,6 +24,24 @@ export type StatsInfoEvent = {
 
 function percent(share: number) {
 	return (share * 100).toFixed(1) + "%";
+}
+
+function currentGroups(): AnimationGroup[] {
+	if (APP.i.api.hasAnimation()) return [];
+
+	const options = APP.i.packOptions;
+	return groupFrames(Object.keys(APP.i.images).map(file => ({
+		file,
+		name: exportedName(file, options.removeFileExtension ?? true, options.prependFolderName ?? true)
+	})));
+}
+
+function renamedPrefix(prefix: string, label: string) {
+	return prefix.substring(0, prefix.lastIndexOf("/") + 1) + label;
+}
+
+function validLabel(label: string) {
+	return label.trim() !== "" && label === label.trim() && !label.includes("/") && !/\d$/.test(label);
 }
 
 export type RepackInfoEvent = {
@@ -37,6 +58,10 @@ interface State {
 	repackCheck: RepackCheckResult | null;
 	si: number;
 	spaceOpen: boolean;
+	groups: AnimationGroup[];
+	clashes: PrefixClash[];
+	clashesOpen: boolean;
+	renames: Readonly<Record<string, string>>;
 }
 
 class StatsInfo extends React.Component<Props, State> {
@@ -52,7 +77,11 @@ class StatsInfo extends React.Component<Props, State> {
 			repackInfo: null,
 			repackCheck: null,
 			si: 1024,
-			spaceOpen: false
+			spaceOpen: false,
+			groups: [],
+			clashes: [],
+			clashesOpen: false,
+			renames: {}
 		};
 	}
 
@@ -61,6 +90,7 @@ class StatsInfo extends React.Component<Props, State> {
 		TypedObserver.siUnitsChanged.on(this.setSI, this);
 		TypedObserver.repackInfo.on(this.updateRepackInfo, this);
 		TypedObserver.repackCheck.on(this.updateRepackCheck, this);
+		TypedObserver.packExporterChanged.on(this.updateClashes, this);
 	}
 
 	override componentWillUnmount = () => {
@@ -68,10 +98,49 @@ class StatsInfo extends React.Component<Props, State> {
 		TypedObserver.siUnitsChanged.off(this.setSI, this);
 		TypedObserver.repackInfo.off(this.updateRepackInfo, this);
 		TypedObserver.repackCheck.off(this.updateRepackCheck, this);
+		TypedObserver.packExporterChanged.off(this.updateClashes, this);
 	}
 
 	updateStatsInfo = (statsInfo: StatsInfoEvent) => {
 		this.setState({ info: statsInfo, repackCheck: null });
+		this.updateClashes();
+	};
+
+	updateClashes = () => {
+		const groups = currentGroups();
+		const clashes = findPrefixClashes(groups);
+		this.setState({ groups, clashes, clashesOpen: this.state.clashesOpen && clashes.length > 0 });
+	};
+
+	toggleClashes = () => {
+		this.setState({ clashesOpen: !this.state.clashesOpen, spaceOpen: false });
+	};
+
+	clashLabel = (clash: PrefixClash) => {
+		return this.state.renames[clash.key] ?? animationLabel(clash.prefix);
+	};
+
+	canRename = (clash: PrefixClash) => {
+		const label = this.clashLabel(clash);
+		const group = this.state.groups.find(item => item.key === clash.key);
+		if (!group || !validLabel(label) || label === animationLabel(clash.prefix)) return false;
+
+		return !renameClashes(group, renamedPrefix(clash.prefix, label), this.state.groups);
+	};
+
+	onRenameChange = (clash: PrefixClash, label: string) => {
+		this.setState({ renames: { ...this.state.renames, [clash.key]: label } });
+	};
+
+	renameClash = (clash: PrefixClash) => {
+		if (!this.canRename(clash)) return;
+
+		const renamed = ImagesList.i.renameAnimation(clash.key, this.clashLabel(clash));
+		if (renamed === null) return;
+
+		const renames = { ...this.state.renames };
+		delete renames[clash.key];
+		this.setState({ renames });
 	};
 
 	updateRepackCheck = (repackCheck: RepackCheckResult | null) => {
@@ -92,8 +161,40 @@ class StatsInfo extends React.Component<Props, State> {
 	};
 
 	toggleSpace = () => {
-		this.setState({ spaceOpen: !this.state.spaceOpen });
+		this.setState({ spaceOpen: !this.state.spaceOpen, clashesOpen: false });
 	};
+
+	renderClashes() {
+		const clashes = this.state.clashes;
+		if (!clashes.length) return <></>;
+
+		return (
+			<>
+				<div className="stats-info-item stats-space" title={I18.f("STATS_CLASH_TITLE")} onClick={this.toggleClashes}>
+					<div className="stats-info-label">{I18.f("STATS_CLASH")} {this.state.clashesOpen ? "▴" : "▾"}</div>
+					<div className="stats-info-value" style={{color: "#FF0000"}}>⚠ {clashes.length}</div>
+				</div>
+				{this.state.clashesOpen ? <div className="space-usage prefix-clashes back-white color-black border-color-gray">
+					<div className="prefix-clash-intro">{I18.f("CLASH_INTRO")}</div>
+					{clashes.map(clash => {
+						const renamable = this.canRename(clash);
+						return (
+							<div key={"clash-" + clash.key} className="prefix-clash border-color-gray">
+								<div>{I18.f("CLASH_MATCHES", clash.prefix, clash.matches.join(", "))}</div>
+								{clash.safePrefix ? <div className="prefix-clash-hint">{I18.f("CLASH_SAFE_PREFIX", clash.safePrefix)}</div> : null}
+								<div className="prefix-clash-rename">
+									<input type="text" className="border-color-gray" value={this.clashLabel(clash)} title={I18.f("CLASH_RENAME_TITLE")}
+										onChange={e => this.onRenameChange(clash, e.target.value)}
+										onKeyDown={e => { if (e.key === "Enter") this.renameClash(clash); }}/>
+									<div className={"btn back-800 border-color-gray color-white" + (renamable ? "" : " bulk-disabled")} onClick={() => this.renameClash(clash)}>{I18.f("CLASH_RENAME")}</div>
+								</div>
+							</div>
+						);
+					})}
+				</div> : <></>}
+			</>
+		);
+	}
 
 	renderScale() {
 		const options = APP.i.packOptions;
@@ -202,6 +303,7 @@ class StatsInfo extends React.Component<Props, State> {
 				</div> : <></>}
 				{this.renderScale()}
 				{this.renderSpace()}
+				{this.renderClashes()}
 				{this.renderCheck()}
 			</div>
 		);

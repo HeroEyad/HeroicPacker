@@ -6,6 +6,7 @@ import Downloader from '../utils/Downloader';
 import PackProperties from './PackProperties';
 import { expandInputs, jobName, optimizeJob, planBulk, type BulkResult } from '../utils/BulkRepack';
 import { JobError, type InputFile, type Job } from 'api/utils/SheetJobs';
+import { readDropped, readPicked } from '../utils/FileInputs';
 import type { FileData } from 'types';
 
 interface Props {}
@@ -37,30 +38,6 @@ function megapixels(pixels: number) {
 
 function nextTick() {
 	return new Promise(resolve => setTimeout(resolve, 0));
-}
-
-async function readFile(file: File, name: string): Promise<InputFile> {
-	return { name, data: new Uint8Array(await file.arrayBuffer()) };
-}
-
-function readEntries(reader: FileSystemDirectoryReader) {
-	return new Promise<FileSystemEntry[]>((resolve, reject) => reader.readEntries(resolve, reject));
-}
-
-function entryFile(entry: FileSystemFileEntry) {
-	return new Promise<File>((resolve, reject) => entry.file(resolve, reject));
-}
-
-async function readEntry(entry: FileSystemEntry, out: InputFile[]) {
-	if (entry.isFile) {
-		out.push(await readFile(await entryFile(entry as FileSystemFileEntry), entry.fullPath));
-		return;
-	}
-
-	const reader = (entry as FileSystemDirectoryEntry).createReader();
-	for (let batch = await readEntries(reader); batch.length; batch = await readEntries(reader)) {
-		for (const child of batch) await readEntry(child, out);
-	}
 }
 
 class BulkOptimizer extends React.Component<Props, State> {
@@ -122,9 +99,7 @@ class BulkOptimizer extends React.Component<Props, State> {
 	}
 
 	onFilesPicked = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const picked = Array.from(e.target.files ?? []);
-		e.target.value = "";
-		await this.addInputs(await Promise.all(picked.map(file => readFile(file, file.webkitRelativePath || file.name))));
+		await this.addInputs(await readPicked(e.target));
 	}
 
 	onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -140,21 +115,7 @@ class BulkOptimizer extends React.Component<Props, State> {
 	onDrop = async (e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		this.setState({ dragging: false });
-
-		const entries = Array.from(e.dataTransfer.items ?? [])
-			.map(item => item.kind === "file" ? item.webkitGetAsEntry() : null)
-			.filter((entry): entry is FileSystemEntry => entry !== null);
-		const files = Array.from(e.dataTransfer.files ?? []);
-
-		const added: InputFile[] = [];
-		if (entries.length) {
-			for (const entry of entries) await readEntry(entry, added);
-		}
-		else {
-			for (const file of files) added.push(await readFile(file, file.name));
-		}
-
-		await this.addInputs(added);
+		await this.addInputs(await readDropped(e.dataTransfer));
 	}
 
 	clear = () => {

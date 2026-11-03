@@ -105,39 +105,50 @@ function originalFiles(job: Job): FileData[] {
 	return files;
 }
 
+export async function readJobFrames(job: Job) {
+	const images: LoadedImages = {};
+	const order: string[] = [];
+	const sizes: string[] = [];
+	let area = 0;
+
+	for (const sheet of job.sheets) {
+		const texture = await loadTexture(sheet.picture.data);
+		sizes.push(texture.width + "x" + texture.height);
+		area += texture.width * texture.height;
+
+		const frames = splitSheet(sheet, texture.width, texture.height);
+		if (!frames.length) throw new Error(`No sprites were found in ${baseName(sheet.file.name)}`);
+
+		Object.assign(images, await extractFrames(texture, frames, sheet.splitter));
+		order.push(...frames.map(frame => frame.name));
+	}
+
+	for (const picture of job.loose) {
+		const image = await loadSprite(picture.data);
+		const spriteName = cleanPath(picture.name) || "sprite.png";
+		image.rect = getDummyRect(spriteName, image.width, image.height);
+		images[spriteName] = image;
+		area += image.width * image.height;
+	}
+	if (job.loose.length) sizes.push(job.loose.length + " png");
+
+	const rects = Object.values(images).map(image => image.rect);
+	setMaxSizesForSourceSize(rects);
+	fixManualOffsets(rects);
+
+	return { images, order, sizes, area } as const;
+}
+
 export async function optimizeJob(job: Job, base: PackOptions): Promise<BulkOutput> {
 	const name = jobName(job);
-	const beforeSizes: string[] = [];
+	let beforeSizes: string[] = [];
 	let before = 0;
 
 	try {
-		const images: LoadedImages = {};
-		const order: string[] = [];
-
-		for (const sheet of job.sheets) {
-			const texture = await loadTexture(sheet.picture.data);
-			beforeSizes.push(texture.width + "x" + texture.height);
-			before += texture.width * texture.height;
-
-			const frames = splitSheet(sheet, texture.width, texture.height);
-			if (!frames.length) throw new Error(`No sprites were found in ${baseName(sheet.file.name)}`);
-
-			Object.assign(images, await extractFrames(texture, frames, sheet.splitter));
-			order.push(...frames.map(frame => frame.name));
-		}
-
-		for (const picture of job.loose) {
-			const image = await loadSprite(picture.data);
-			const spriteName = cleanPath(picture.name) || "sprite.png";
-			image.rect = getDummyRect(spriteName, image.width, image.height);
-			images[spriteName] = image;
-			before += image.width * image.height;
-		}
-		if (job.loose.length) beforeSizes.push(job.loose.length + " png");
-
-		const rects = Object.values(images).map(image => image.rect);
-		setMaxSizesForSourceSize(rects);
-		fixManualOffsets(rects);
+		const read = await readJobFrames(job);
+		const { images, order } = read;
+		beforeSizes = read.sizes;
+		before = read.area;
 
 		const exporter = (job.sheets.length ? getExporterByType(job.sheets[0].splitter.splitterName) : null) ?? base.exporterCls;
 		const options: PackOptions = {

@@ -1,5 +1,11 @@
 # Unreleased
 
+- Compare sheets, to see which frames changed, moved, were renamed, added or removed between two versions of a sheet
+- Prefix clash warning in the header, with the safe prefix to use and a rename that only goes through once the clash is gone
+- Note skin check for Psych Engine, Codename Engine and V-Slice note sheets
+- Bulk optimize moved into the new Tools menu
+- Ctrl+A in a text field selects its text again instead of every image
+- Projects: save the frames, edits, character settings and options as a `.heroic` file and open it later, with a warning before closing the page on unsaved edits
 - Import character files from Psych Engine, Codename Engine, Nightmare Vision and V-Slice, and export them for texture atlases too
 - Per-frame offsets in the animation preview, kept when repacking
 - Convert Adobe Animate texture atlases to Sparrow frames

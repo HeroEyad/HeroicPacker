@@ -18,6 +18,8 @@ import { Observer, GLOBAL_EVENT } from '../Observer';
 import type { PackOptions } from 'api/types';
 import TypedObserver from 'TypedObserver';
 import APP from 'client/APP';
+import { pickProject, saveProject } from '../Project';
+import type { CustomExporterData } from '../utils/ProjectFile';
 
 const STORAGE_OPTIONS_KEY = "pack-options";
 const STORAGE_CUSTOM_EXPORTER_KEY = "custom-exporter";
@@ -97,18 +99,28 @@ class PackProperties extends React.Component<Props, State> {
 		this.packOptions = this.applyOptionsDefaults(data);
 		this.saveOptions();
 		this.refreshPackOptions();
+		this.updateEditCustomTemplateButton();
+		this.updateCharacterFileRow();
+		this.setState({packer: this.packOptions.packer});
 		this.emitChanges();
 	}
 
 	loadCustomExporter = () => {
 		let data = Storage.load(STORAGE_CUSTOM_EXPORTER_KEY);
-		if(data) {
-			let exporter = getExporterByType("custom");
-			exporter.allowTrim = data.allowTrim;
-			exporter.allowRotation = data.allowRotation;
-			exporter.fileExt = data.fileExt;
-			exporter.content = data.content;
-		}
+		if(data) this.applyCustomExporter(data);
+	}
+
+	applyCustomExporter = (data: CustomExporterData) => {
+		let exporter = getExporterByType("custom");
+		exporter.allowTrim = data.allowTrim;
+		exporter.allowRotation = data.allowRotation;
+		exporter.fileExt = data.fileExt;
+		exporter.content = data.content;
+	}
+
+	setCustomExporter = (data: CustomExporterData) => {
+		this.applyCustomExporter(data);
+		Storage.save(STORAGE_CUSTOM_EXPORTER_KEY, getExporterByType("custom"));
 	}
 
 	loadOptions = () => {
@@ -375,6 +387,17 @@ class PackProperties extends React.Component<Props, State> {
 				<div className="pack-properties-containter">
 					<table>
 						<tbody>
+							<tr>
+								<td colSpan={3} className="center-align">
+									{I18.f("PROJECT")}
+								</td>
+							</tr>
+							<tr>
+								<td colSpan={3} className="center-align project-buttons">
+									<div className="btn back-800 border-color-gray color-white" title={I18.f("PROJECT_OPEN_TITLE")} onClick={pickProject}>{I18.f("PROJECT_OPEN")}</div>
+									<div className="btn back-800 border-color-gray color-white" title={I18.f("PROJECT_SAVE_TITLE")} onClick={saveProject}>{I18.f("PROJECT_SAVE")}</div>
+								</td>
+							</tr>
 							<tr>
 								<td colSpan={3} className="center-align">
 									Export Options

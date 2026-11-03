@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 import I18 from './locale/I18';
 import APP from './APP';
+import { initProjects } from './Project';
 import MainLayout from './ui/MainLayout';
 
 import Storage from './utils/Storage';
@@ -47,6 +48,7 @@ function loadLocalization() {
 	I18.currentLanguage = getLanguageByCode(Storage.load(STORAGE_LANGUAGE_KEY, false));
 
 	new APP();
+	initProjects();
 
 	I18.load(renderLayout);
 

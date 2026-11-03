@@ -1,4 +1,5 @@
 import type { AnimationOffset } from "./AnimateAtlas";
+import { clashingGroups, safePrefix } from "./PrefixClash";
 
 export type CharacterFileFormat = "psych" | "codename" | "nmv" | "vslice";
 
@@ -316,15 +317,8 @@ export function importedSettings(character: ImportedCharacter, groups: readonly 
 }
 
 function enginePrefix(animation: ResolvedAnimation, all: readonly ResolvedAnimation[]) {
-	const prefix = animation.prefix;
-	const ambiguous = all.some(other => other !== animation && other.prefix !== prefix && other.prefix.startsWith(prefix));
-	if (!ambiguous) return prefix;
-
-	const next = new Set(animation.names.map(name => name.charAt(prefix.length)));
-	if (next.size !== 1) return prefix;
-
-	const [digit] = next;
-	return /\d/.test(digit) ? prefix + digit : prefix;
+	if (!clashingGroups(animation, all).length) return animation.prefix;
+	return safePrefix(animation, all) ?? animation.prefix;
 }
 
 export function labelGroups(labels: ReadonlyArray<Readonly<{ name: string, length: number }>>, frameRate: number): AnimationGroup[] {

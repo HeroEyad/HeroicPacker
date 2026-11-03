@@ -10,6 +10,8 @@ import OldBrowserBlocker from './OldBrowserBlocker';
 import EditCustomExporter from './EditCustomExporter';
 import SheetSplitter from './SheetSplitter';
 import BulkOptimizer from './BulkOptimizer';
+import SheetCompare from './SheetCompare';
+import NoteSkinChecker from './NoteSkinChecker';
 
 import { Observer, GLOBAL_EVENT } from '../Observer';
 import TypedObserver from 'TypedObserver';
@@ -32,6 +34,8 @@ interface State {
 	editCustomExporter: boolean;
 	sheetSplitter: boolean;
 	bulkOptimizer: boolean;
+	sheetCompare: boolean;
+	noteSkinCheck: boolean;
 	browserBlocker: boolean;
 }
 
@@ -46,6 +50,8 @@ class MainLayout extends React.Component<Props, State> {
 			editCustomExporter: false,
 			sheetSplitter: false,
 			bulkOptimizer: false,
+			sheetCompare: false,
+			noteSkinCheck: false,
 			browserBlocker: !OldBrowserBlocker.isSupported()
 		};
 	}
@@ -60,6 +66,10 @@ class MainLayout extends React.Component<Props, State> {
 		Observer.on(GLOBAL_EVENT.HIDE_SHEET_SPLITTER, this.hideSheetSplitter, this);
 		Observer.on(GLOBAL_EVENT.SHOW_BULK_OPTIMIZER, this.showBulkOptimizer, this);
 		Observer.on(GLOBAL_EVENT.HIDE_BULK_OPTIMIZER, this.hideBulkOptimizer, this);
+		Observer.on(GLOBAL_EVENT.SHOW_SHEET_COMPARE, this.showSheetCompare, this);
+		Observer.on(GLOBAL_EVENT.HIDE_SHEET_COMPARE, this.hideSheetCompare, this);
+		Observer.on(GLOBAL_EVENT.SHOW_NOTE_SKIN_CHECK, this.showNoteSkinCheck, this);
+		Observer.on(GLOBAL_EVENT.HIDE_NOTE_SKIN_CHECK, this.hideNoteSkinCheck, this);
 	}
 
 	override componentWillUnmount = () => {
@@ -72,6 +82,10 @@ class MainLayout extends React.Component<Props, State> {
 		Observer.off(GLOBAL_EVENT.HIDE_SHEET_SPLITTER, this.hideSheetSplitter, this);
 		Observer.off(GLOBAL_EVENT.SHOW_BULK_OPTIMIZER, this.showBulkOptimizer, this);
 		Observer.off(GLOBAL_EVENT.HIDE_BULK_OPTIMIZER, this.hideBulkOptimizer, this);
+		Observer.off(GLOBAL_EVENT.SHOW_SHEET_COMPARE, this.showSheetCompare, this);
+		Observer.off(GLOBAL_EVENT.HIDE_SHEET_COMPARE, this.hideSheetCompare, this);
+		Observer.off(GLOBAL_EVENT.SHOW_NOTE_SKIN_CHECK, this.showNoteSkinCheck, this);
+		Observer.off(GLOBAL_EVENT.HIDE_NOTE_SKIN_CHECK, this.hideNoteSkinCheck, this);
 	}
 
 	showMessage = (content: string, buttons?: ButtonData[]) => {
@@ -117,6 +131,22 @@ class MainLayout extends React.Component<Props, State> {
 		this.setState({bulkOptimizer: false});
 	}
 
+	showSheetCompare = () => {
+		this.setState({sheetCompare: true});
+	}
+
+	hideSheetCompare = () => {
+		this.setState({sheetCompare: false});
+	}
+
+	showNoteSkinCheck = () => {
+		this.setState({noteSkinCheck: true});
+	}
+
+	hideNoteSkinCheck = () => {
+		this.setState({noteSkinCheck: false});
+	}
+
 	showMobileTab = (tab: MobileTab) => {
 		this.setState({mobileTab: tab});
 	}
@@ -134,6 +164,8 @@ class MainLayout extends React.Component<Props, State> {
 					{this.state.editCustomExporter ? (<EditCustomExporter/>) : null}
 					{this.state.sheetSplitter ? (<SheetSplitter/>) : null}
 					{this.state.bulkOptimizer ? (<BulkOptimizer/>) : null}
+					{this.state.sheetCompare ? (<SheetCompare/>) : null}
+					{this.state.noteSkinCheck ? (<NoteSkinChecker/>) : null}
 					{this.state.processing ? (<ProcessingOverlay/>) : null}
 					{this.state.messageBox}
 				</div>

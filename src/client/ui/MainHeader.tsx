@@ -19,7 +19,41 @@ const {
 	version: appVersion
 } = appInfo;
 
-class MainHeader extends React.Component {
+const TOOLS: ReadonlyArray<Readonly<{ label: string, title: string, event: string }>> = [
+	{ label: "BULK_OPTIMIZE", title: "BULK_OPTIMIZE_TITLE", event: GLOBAL_EVENT.SHOW_BULK_OPTIMIZER },
+	{ label: "COMPARE", title: "COMPARE_TITLE", event: GLOBAL_EVENT.SHOW_SHEET_COMPARE },
+	{ label: "NOTESKIN", title: "NOTESKIN_TITLE", event: GLOBAL_EVENT.SHOW_NOTE_SKIN_CHECK }
+];
+
+interface State {
+	toolsOpen: boolean;
+}
+
+class MainHeader extends React.Component<{}, State> {
+	private readonly toolsRef: React.RefObject<HTMLDivElement> = React.createRef();
+
+	override state: State = { toolsOpen: false };
+
+	override componentDidMount = () => {
+		document.addEventListener("pointerdown", this.onPointerDown);
+	}
+
+	override componentWillUnmount = () => {
+		document.removeEventListener("pointerdown", this.onPointerDown);
+	}
+
+	onPointerDown = (e: PointerEvent) => {
+		if (this.state.toolsOpen && !this.toolsRef.current?.contains(e.target as Node)) this.setState({ toolsOpen: false });
+	}
+
+	toggleTools = () => {
+		this.setState({ toolsOpen: !this.state.toolsOpen });
+	}
+
+	openTool = (event: string) => {
+		this.setState({ toolsOpen: false });
+		Observer.emit(event);
+	}
 
 	changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		TypedObserver.changeLanguage.emit(getLanguageByCode(e.target.value));
@@ -31,10 +65,6 @@ class MainHeader extends React.Component {
 
 	showSplitter = () => {
 		Observer.emit(GLOBAL_EVENT.SHOW_SHEET_SPLITTER);
-	}
-
-	showBulkOptimizer = () => {
-		Observer.emit(GLOBAL_EVENT.SHOW_BULK_OPTIMIZER);
 	}
 
 	override render() {
@@ -63,7 +93,14 @@ class MainHeader extends React.Component {
 				<div className='right-align'>
 					<div className="main-header-controls">
 						<div className="btn back-700 border-color-gray color-white" onClick={this.showSplitter}>{I18.f("SPLITTER")}</div>
-						<div className="btn back-700 border-color-gray color-white main-header-bulk" title={I18.f("BULK_OPTIMIZE_TITLE")} onClick={this.showBulkOptimizer}>{I18.f("BULK_OPTIMIZE")}</div>
+						<div className="main-header-tools" ref={this.toolsRef}>
+							<div className="btn back-700 border-color-gray color-white" onClick={this.toggleTools}>{I18.f("TOOLS")} {this.state.toolsOpen ? "▴" : "▾"}</div>
+							{this.state.toolsOpen ? <div className="tools-menu back-white color-black border-color-gray">
+								{TOOLS.map(tool => (
+									<div key={"tool-" + tool.label} className="tools-menu-item" title={I18.f(tool.title)} onClick={() => this.openTool(tool.event)}>{I18.f(tool.label)}</div>
+								))}
+							</div> : null}
+						</div>
 					</div>
 
 					<div className="main-header-language border-color-gray">

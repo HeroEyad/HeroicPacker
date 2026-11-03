@@ -16,6 +16,8 @@ import type { LoadedImages } from 'api/types';
 import APP from 'client/APP';
 import { animationKey } from 'api/utils/Character';
 import { frameName, frameNaming, replaceInOrder } from 'api/utils/FrameTiming';
+import { hasUnsavedChanges, markSaved, openProject } from '../Project';
+import { isProjectFile } from '../utils/ProjectFile';
 
 let INSTANCE:ImagesList;
 
@@ -87,6 +89,12 @@ class ImagesList extends React.Component<Props, State> {
 	}
 
 	handleKeys = (e:KeyboardEvent) => {
+		const target = e?.target;
+		const typing = target instanceof HTMLTextAreaElement
+			|| (target instanceof HTMLInputElement && !["checkbox", "radio", "button", "range", "file", "color"].includes(target.type))
+			|| (target instanceof HTMLElement && target.isContentEditable);
+		if(typing) return;
+
 		if(e) {
 			if(e.key === "F2") {
 				const current = Object.keys(this.state.images).find(key => this.state.images[key].current);
@@ -119,6 +127,12 @@ class ImagesList extends React.Component<Props, State> {
 		e.preventDefault();
 
 		if(!e.dataTransfer) return false;
+
+		const project = Array.from(e.dataTransfer.files).find(file => isProjectFile(file.name));
+		if(project) {
+			openProject(project);
+			return false;
+		}
 
 		if(e.dataTransfer.files.length) {
 			let loader = new LocalImagesLoader();
@@ -167,6 +181,7 @@ class ImagesList extends React.Component<Props, State> {
 		const names = Object.keys(data);
 
 		if(names.length) {
+			const unsaved = hasUnsavedChanges();
 			let images = this.state.images;
 			const rects = [];
 
@@ -186,6 +201,7 @@ class ImagesList extends React.Component<Props, State> {
 
 			this.setState({images: images});
 			TypedObserver.imagesListChanged.emit(images);
+			if(!unsaved) markSaved();
 		}
 	}
 

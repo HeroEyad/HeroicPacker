@@ -25,6 +25,7 @@ is a tool designed to create and optimize spritesheets and texture atlas.
 - Load a sheet with its data file and repack it smaller, or split it back into frames
 - Bulk optimize: drop a folder or zip of sheets and get every one of them repacked. A sheet is only replaced when the new one is actually smaller
 - Repack check: after exporting, every frame is compared with where it should sit, so you can see nothing moved
+- Compare sheets: load two versions of a sheet and see which frames changed, moved, were renamed, added or removed, with a before, after and difference view
 
 **Adobe Animate texture atlases**
 
@@ -37,7 +38,15 @@ is a tool designed to create and optimize spritesheets and texture atlas.
 - Preview every animation, with per-animation offsets, per-frame offsets, frame reordering and renaming
 - Auto-align lines every animation up with the idle pose as a starting point
 - Import and export character files for Psych Engine, Codename Engine, Nightmare Vision and V-Slice
+- Prefix clash warning: flags animations whose prefix also picks up another animation's frames, like `BF NOTE LEFT` and `BF NOTE LEFT MISS`, and shows the prefix to use instead or lets you rename one
+- Note skin check: confirms a `NOTE_assets` sheet has every note, hold and strum animation Psych, Codename or V-Slice looks for, with a preview of each one
 - GIF and APNG import: every frame becomes a sprite and keeps its duration
+
+**Projects**
+
+- Save your work as a `.heroic` file and open it later to pick up where you left off: frames, offsets, timing, names, character settings and options are all kept
+- Ctrl+S saves, Ctrl+O opens, or drop a project on the image list
+- The page warns you before closing when there are edits you haven't saved
 
 **Everything else**
 
@@ -146,6 +155,7 @@ The built-in formats in [src/api/exporters/templates](src/api/exporters/template
 Bug reports and pull requests are welcome. Before opening a pull request, make sure `npx tsc --noEmit` and `yarn build` both pass.
 
 To add or fix a translation, edit the matching file in [src/client/locale/languages](src/client/locale/languages). `en.json` has every key.
+(REMINDER: There are translations made by Google Translate so it might be not accurate so please help me fix it ok?)
 
 ## Credits
 
