@@ -65,8 +65,8 @@ class AtlasSpritemap extends Splitter {
 				res.push({
 					name: name,
 					frame: {
-						x: item.x,
-						y: item.y,
+						x: item.x ?? 0,
+						y: item.y ?? 0,
 						w: width,
 						h: height
 					},
@@ -87,7 +87,7 @@ class AtlasSpritemap extends Splitter {
 						h: height
 					},
 					trimmed: false,
-					rotated: item.rotated
+					rotated: item.rotated ?? false
 				});
 			}
 
