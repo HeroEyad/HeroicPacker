@@ -6,7 +6,7 @@
 
 is a tool designed to create and optimize spritesheets and texture atlas.
 
-**Use it at [heroicpacker.heroeyad.dev](https://heroicpacker.heroeyad.dev/)**
+**Use it at [heroicpacker.heroeyad.dev](https://heroicpacker.heroeyad.dev/) or download the app on [GameBanana!](https://gamebanana.com/tools/24738)**
 
 ![Heroic Packer](docs/image.png)
 
