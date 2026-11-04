@@ -109,6 +109,8 @@
 	"REPACK": "Repack",
 	"CLEAR_STORED_ORDER_TITLE": "Cancella l'ordine dal repack",
 	"CLEAR_STORED_ORDER": "Cancella ordine memorizzato",
+	"RESET_OPTIONS_TITLE": "Ripristina tutte le impostazioni ai valori predefiniti. Lingua e tema non vengono modificati.",
+	"RESET_OPTIONS": "Ripristina i valori predefiniti",
 	"SORT_EXPORT_TITLE": "Ordina righe esportate",
 	"SORT_EXPORT": "Ordina le righe esportate:",
 	"UPDATE_FILENAME": "Aggiorna nome file:",

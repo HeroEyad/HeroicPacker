@@ -109,6 +109,8 @@
     "REPACK": "إعادة تجميع (Repack)",
     "CLEAR_STORED_ORDER_TITLE": "بيمسح الترتيب من إعادة التجميع",
     "CLEAR_STORED_ORDER": "امسح الترتيب المحفوظ",
+    "RESET_OPTIONS_TITLE": "بيرجّع كل الإعدادات لقيمها الافتراضية. اللغة والشكل مش هيتغيروا.",
+    "RESET_OPTIONS": "رجّع الإعدادات الافتراضية",
     "SORT_EXPORT_TITLE": "رتب الصفوف المتصدرة",
     "SORT_EXPORT": "رتب الصفوف المتصدرة:",
     "UPDATE_FILENAME": "تحديث اسم الملف:",

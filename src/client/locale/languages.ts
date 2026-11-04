@@ -1,6 +1,7 @@
 import * as en from "./languages/en.json";
 import * as de from "./languages/de.json";
 import * as es from "./languages/es.json";
+import * as id from "./languages/id.json";
 import * as ru from "./languages/ru.json";
 import * as ar from "./languages/ar-eg.json";
 import * as zh from "./languages/zh-cn.json";
@@ -25,6 +26,7 @@ export const languages: Language[] = [
 	{ lang: "en", name: "english", mapping: en },
 	{ lang: "de", name: "deutsch", mapping: de },
 	{ lang: "es", name: "español", mapping: es },
+	{ lang: "id", name: "bahasa indonesia", mapping: id},
 	{ lang: "ru", name: "русский", mapping: ru },
 	{ lang: "ar-eg", name: "العربية (مصر)", mapping: ar},
 	{ lang: "zh-cn", name: "简体中文", mapping: zh },

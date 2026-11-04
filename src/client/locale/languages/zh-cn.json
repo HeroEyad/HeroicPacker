@@ -110,6 +110,8 @@
 	"REPACK": "Repack",
 	"CLEAR_STORED_ORDER_TITLE": "Clears the order from the repack",
 	"CLEAR_STORED_ORDER": "Clear Stored Order",
+	"RESET_OPTIONS_TITLE": "将所有设置恢复为默认值。语言和主题设置不受影响。",
+    "RESET_OPTIONS": "恢复默认设置",
 	"SORT_EXPORT_TITLE": "Sort Exported Rows",
 	"SORT_EXPORT": "Sort Exported Rows:",
 	"UPDATE_FILENAME": "Update Filename:",
