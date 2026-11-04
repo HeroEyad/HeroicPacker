@@ -80,6 +80,7 @@ class PackProperties extends React.Component<Props, State> {
 	override componentDidMount = () => {
 		TypedObserver.storedOrderChanged.on(this.onStoredOrderChanged, this);
 
+		this.refreshPackOptions();
 		this.updateEditCustomTemplateButton();
 		this.updateCharacterFileRow();
 		this.emitChanges();
@@ -95,6 +96,13 @@ class PackProperties extends React.Component<Props, State> {
 
 	setOptions = (data: PackOptions) => {
 		this.packOptions = this.applyOptionsDefaults(data);
+		this.saveOptions();
+		this.refreshPackOptions();
+		this.emitChanges();
+	}
+
+	resetOptions = () => {
+		this.packOptions = this.applyOptionsDefaults(null);
 		this.saveOptions();
 		this.refreshPackOptions();
 		this.emitChanges();
@@ -520,6 +528,12 @@ class PackProperties extends React.Component<Props, State> {
 											<div className="btn back-800 border-color-gray color-white" onClick={APP.i.api.clearOrder}>{I18.f("CLEAR_STORED_ORDER")}</div> :
 											<></>
 									}
+								</td>
+							</tr>
+
+							<tr title={I18.f("RESET_OPTIONS_TITLE")}>
+								<td colSpan={3} className="center-align">
+									<div className="btn back-black border-color-gray color-white" onClick={this.resetOptions}>{I18.f("RESET_OPTIONS")}</div>
 								</td>
 							</tr>
 

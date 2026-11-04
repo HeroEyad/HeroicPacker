@@ -124,6 +124,8 @@
 	"REPACK": "Repack",
 	"CLEAR_STORED_ORDER": "Supprimer l'ordre stockée",
 	"CLEAR_STORED_ORDER_TITLE": "Supprime l'ordre du repack",
+	"RESET_OPTIONS_TITLE": "Restaure tous les réglages à leurs valeurs par défaut. La langue et le thème ne sont pas touchés.",
+	"RESET_OPTIONS": "Réinitialiser les réglages",
 	"SORT_EXPORT": "Trier rangées exporté :",
 	"SORT_EXPORT_TITLE": "Trier les rangées exporté",
 	"UPDATE_FILENAME": "MàJ nom fichier :",

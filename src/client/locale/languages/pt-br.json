@@ -109,6 +109,8 @@
 	"REPACK": "Repack",
 	"CLEAR_STORED_ORDER_TITLE": "Limpa a ordem do pacote de sprites",
 	"CLEAR_STORED_ORDER": "Limpar ordem salva",
+	"RESET_OPTIONS_TITLE": "Restaura todas as configurações para os valores padrão. Idioma e tema não são afetados.",
+    "RESET_OPTIONS": "Restaurar padrões",
 	"SORT_EXPORT_TITLE": "Permite que linhas exportadas sejam organizadas em ordem",
 	"SORT_EXPORT": "Organizar Linhas Exportadas:",
 	"UPDATE_FILENAME": "Autalizar Nome do Arquivo:",
