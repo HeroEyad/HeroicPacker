@@ -12,6 +12,8 @@ import SheetSplitter from './SheetSplitter';
 import BulkOptimizer from './BulkOptimizer';
 import SheetCompare from './SheetCompare';
 import NoteSkinChecker from './NoteSkinChecker';
+import FlaImportDialog from './FlaImportDialog';
+import type { FlaImportRequest } from '../utils/FlaImport';
 
 import { Observer, GLOBAL_EVENT } from '../Observer';
 import TypedObserver from 'TypedObserver';
@@ -37,6 +39,7 @@ interface State {
 	sheetCompare: boolean;
 	noteSkinCheck: boolean;
 	browserBlocker: boolean;
+	flaImport: FlaImportRequest | null;
 }
 
 class MainLayout extends React.Component<Props, State> {
@@ -52,12 +55,14 @@ class MainLayout extends React.Component<Props, State> {
 			bulkOptimizer: false,
 			sheetCompare: false,
 			noteSkinCheck: false,
-			browserBlocker: !OldBrowserBlocker.isSupported()
+			browserBlocker: !OldBrowserBlocker.isSupported(),
+			flaImport: null
 		};
 	}
 
 	override componentDidMount = () => {
 		TypedObserver.showMessage.on(this.showMessage, this);
+		TypedObserver.flaImportRequested.on(this.showFlaImport, this);
 		Observer.on(GLOBAL_EVENT.SHOW_PROCESSING, this.showProcessing, this);
 		Observer.on(GLOBAL_EVENT.HIDE_PROCESSING, this.hideProcessing, this);
 		Observer.on(GLOBAL_EVENT.SHOW_EDIT_CUSTOM_EXPORTER, this.showEditCustomExporter, this);
@@ -74,6 +79,7 @@ class MainLayout extends React.Component<Props, State> {
 
 	override componentWillUnmount = () => {
 		TypedObserver.showMessage.off(this.showMessage, this);
+		TypedObserver.flaImportRequested.off(this.showFlaImport, this);
 		Observer.off(GLOBAL_EVENT.SHOW_PROCESSING, this.showProcessing, this);
 		Observer.off(GLOBAL_EVENT.HIDE_PROCESSING, this.hideProcessing, this);
 		Observer.off(GLOBAL_EVENT.SHOW_EDIT_CUSTOM_EXPORTER, this.showEditCustomExporter, this);
@@ -97,6 +103,14 @@ class MainLayout extends React.Component<Props, State> {
 
 	closeMessage = () => {
 		this.setState({messageBox: null});
+	}
+
+	showFlaImport = (request: FlaImportRequest) => {
+		this.setState({flaImport: request});
+	}
+
+	closeFlaImport = () => {
+		this.setState({flaImport: null});
 	}
 
 	showProcessing = () => {
@@ -167,6 +181,7 @@ class MainLayout extends React.Component<Props, State> {
 					{this.state.sheetCompare ? (<SheetCompare/>) : null}
 					{this.state.noteSkinCheck ? (<NoteSkinChecker/>) : null}
 					{this.state.processing ? (<ProcessingOverlay/>) : null}
+					{this.state.flaImport ? (<FlaImportDialog request={this.state.flaImport} onClose={this.closeFlaImport}/>) : null}
 					{this.state.messageBox}
 				</div>
 

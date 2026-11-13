@@ -1,6 +1,6 @@
 {
 	"name": "heroic-packer",
-	"displayName": "Heroic Packer",
+	"displayName": "Heroic Packer (DEV)",
 	"version": "0.1.6",
 	"description": "Sprite sheet and texture atlas packer for Friday Night Funkin' mods and other 2D games",
 	"type": "module",
@@ -34,6 +34,8 @@
 		"buffer": "^6.0.3",
 		"core-js": "^3.39.0",
 		"eventemitter3": "^5.0.1",
+		"fast-xml-parser": "^5.12.0",
+		"fflate": "^0.8.3",
 		"file-saver": "^2.0.0",
 		"jszip": "^3.10.1",
 		"maxrects-packer": "^2.7.3",

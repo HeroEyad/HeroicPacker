@@ -243,5 +243,15 @@
     "MOBILE_TAB_OPTIONS": "الإعدادات",
     "RENAME_EXISTS_ERROR": "مينفعش تغيّر الاسم: %s موجود قبل كده.",
     "RENAME_FRAME_TITLE": "دبل كليك أو دوس F2 عشان تغيّر الاسم",
-    "RENAME_ANIMATE_ERROR": "مينفعش تغيّر أسامي فريمات أطلس Animate: ملف Animation.json بيستخدمها بأساميها."
+    "RENAME_ANIMATE_ERROR": "مينفعش تغيّر أسامي فريمات أطلس Animate: ملف Animation.json بيستخدمها بأساميها.",
+	"FLA_IMPORT_TITLE": "Choose what to import from %s",
+	"FLA_IMPORT_SEARCH": "Search symbols",
+	"FLA_IMPORT_ALL": "All",
+	"FLA_IMPORT_NONE": "None",
+	"FLA_IMPORT_FRAMES": "%s frames",
+	"FLA_IMPORT_CONFIRM": "Import (%s)",
+	"FLA_NO_SYMBOLS": "%s has no symbols or scenes with frames to import.",
+	"FLA_READ_ERROR": "Could not read %s. Only FLA files saved by Animate or Flash CS5 and newer are supported, older ones need to be resaved.",
+	"FLA_IMPORT_SKIPPED": "Nothing was imported for: %s (empty, or larger than 8192 px).",
+	"FLA_BITMAP_WARNING": "%s bitmap(s) could not be decoded and were left out."
 }

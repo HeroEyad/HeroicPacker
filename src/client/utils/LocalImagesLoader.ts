@@ -1,6 +1,9 @@
 import CustomImage from "../data/CustomImage";
 import type { LoadedImages } from "api/types";
 import { loadAnimationFrames, mayBeAnimated } from "./AnimationFramesLoader";
+import { loadFlaFile } from "./FlaImport";
+import TypedObserver from "TypedObserver";
+import I18 from "../locale/I18";
 
 class LocalImagesLoader {
 	data: File[];
@@ -47,7 +50,10 @@ class LocalImagesLoader {
 			return;
 		}
 
-		if (types.indexOf(item.type) >= 0) {
+		if (/\.fla$/i.test(item.name)) {
+			this.loadFla(item);
+		}
+		else if (types.indexOf(item.type) >= 0) {
 			if (this.splitAnimations && mayBeAnimated(item.name)) {
 				this.loadAnimated(item);
 			}
@@ -58,6 +64,18 @@ class LocalImagesLoader {
 		else {
 			this.loadNext();
 		}
+	}
+
+	private loadFla = async (item: File) => {
+		try {
+			await loadFlaFile(item, this.loaded);
+		}
+		catch (e) {
+			console.error(e);
+			TypedObserver.showMessage.emit(I18.f("FLA_READ_ERROR", item.name));
+		}
+
+		this.onLoaded();
 	}
 
 	private loadAnimated = async (item: File) => {

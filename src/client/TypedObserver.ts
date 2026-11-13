@@ -6,6 +6,7 @@ import type { LoadedImages, PackOptions } from "api/types";
 import TypedObserver from "api/TypedObserver";
 import type { Language } from "./locale/languages";
 import type { RepackCheckResult } from "./utils/RepackChecker";
+import type { FlaImportRequest } from "./utils/FlaImport";
 
 export default {
 	imagesListChanged: new TypedObserver<Readonly<LoadedImages>>(),
@@ -23,4 +24,5 @@ export default {
 	storedOrderChanged: new TypedObserver<Readonly<string>[]>(),
 	repackInfo: new TypedObserver<Readonly<RepackInfoEvent> | null>(),
 	repackCheck: new TypedObserver<Readonly<RepackCheckResult> | null>(),
+	flaImportRequested: new TypedObserver<Readonly<FlaImportRequest>>(),
 };

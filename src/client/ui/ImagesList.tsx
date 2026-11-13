@@ -628,7 +628,7 @@ class ImagesList extends React.Component<Props, State> {
 			<span>
 				<div className="btn back-800 border-color-gray color-white file-upload" title={I18.f("ADD_IMAGES_TITLE")}>
 					{I18.f("ADD_IMAGES")}
-					<input type="file" ref={this.addImagesInputRef} multiple accept="image/png,image/jpg,image/jpeg,image/gif" onChange={this.addImages} />
+					<input type="file" ref={this.addImagesInputRef} multiple accept="image/png,image/jpg,image/jpeg,image/gif,.fla" onChange={this.addImages} />
 				</div>
 
 				<div className="btn back-800 border-color-gray color-white file-upload" title={I18.f("ADD_ZIP_TITLE")}>

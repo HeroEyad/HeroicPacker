@@ -502,6 +502,83 @@ body {
 	min-width: 50px;
 }
 
+.fla-import-window {
+	width: 440px;
+	height: auto;
+	max-height: calc(100% - 96px);
+	margin-top: 48px;
+	text-align: left;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+}
+
+.fla-import-title {
+	font-weight: bold;
+	margin-bottom: 8px;
+	word-break: break-all;
+}
+
+.fla-import-tools {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 8px;
+	align-items: center;
+}
+
+.fla-import-tools input[type=text] {
+	flex: 1;
+	min-width: 0;
+}
+
+.fla-import-list {
+	flex: 1;
+	min-height: 120px;
+	overflow: auto;
+	border-width: 1px;
+	border-style: solid;
+}
+
+.fla-import-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 8px;
+	cursor: pointer;
+}
+
+.fla-import-row:hover {
+	background: rgba(128, 128, 128, 0.15);
+}
+
+.fla-import-name {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.fla-import-meta {
+	opacity: 0.6;
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+.fla-import-buttons {
+	padding-top: 12px;
+	text-align: right;
+}
+
+.fla-import-buttons .btn {
+	margin-left: 8px;
+}
+
+.fla-import-buttons .btn.disabled {
+	opacity: 0.45;
+	cursor: default;
+}
+
 .processing-overlay {
 	position: fixed;
 	left: 0;

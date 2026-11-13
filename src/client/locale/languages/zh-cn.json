@@ -243,5 +243,15 @@
 	"MOBILE_TAB_OPTIONS": "选项",
 	"RENAME_EXISTS_ERROR": "无法重命名：%s 已存在。",
 	"RENAME_FRAME_TITLE": "双击或按 F2 重命名",
-	"RENAME_ANIMATE_ERROR": "无法重命名 Animate 图集的帧：Animation.json 按名称引用它们。"
+	"RENAME_ANIMATE_ERROR": "无法重命名 Animate 图集的帧：Animation.json 按名称引用它们。",
+	"FLA_IMPORT_TITLE": "Choose what to import from %s",
+	"FLA_IMPORT_SEARCH": "Search symbols",
+	"FLA_IMPORT_ALL": "All",
+	"FLA_IMPORT_NONE": "None",
+	"FLA_IMPORT_FRAMES": "%s frames",
+	"FLA_IMPORT_CONFIRM": "Import (%s)",
+	"FLA_NO_SYMBOLS": "%s has no symbols or scenes with frames to import.",
+	"FLA_READ_ERROR": "Could not read %s. Only FLA files saved by Animate or Flash CS5 and newer are supported, older ones need to be resaved.",
+	"FLA_IMPORT_SKIPPED": "Nothing was imported for: %s (empty, or larger than 8192 px).",
+	"FLA_BITMAP_WARNING": "%s bitmap(s) could not be decoded and were left out."
 }
