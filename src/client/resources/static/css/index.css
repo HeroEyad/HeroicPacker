@@ -565,6 +565,14 @@ body {
 	white-space: nowrap;
 }
 
+.fla-import-option {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding-top: 10px;
+	cursor: pointer;
+}
+
 .fla-import-buttons {
 	padding-top: 12px;
 	text-align: right;
@@ -687,6 +695,17 @@ body {
 	background-image: url(../images/folder.png);
 	margin-right: 4px;
 	margin-bottom: -4px;
+}
+
+.tree-view-animation {
+	background-image: none;
+	text-align: center;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.tree-view-animation:after {
+	content: '\25B6';
 }
 
 .border-color-gray {

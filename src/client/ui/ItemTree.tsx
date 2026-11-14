@@ -7,6 +7,7 @@ import I18 from '../locale/I18';
 export interface TreeListItem {
 	img: CustomImage | null;
 	isFolder: boolean;
+	isAnimation?: boolean;
 	path: string;
 	name: string;
 	selected: boolean;
@@ -183,7 +184,7 @@ class ItemTreeView extends React.Component<PropsWithChildren<TreeListItem>, Tree
 		}
 
 		const arrow = (<div className={arrowClass} onClick={this.handleCollapse}/>);
-		const folderIcon = (<div className="tree-view-folder"></div>);
+		const folderIcon = this.props.isAnimation ? (<div className="tree-view-folder tree-view-animation" title={I18.f("FLA_ANIMATION_FOLDER_TITLE")}></div>) : (<div className="tree-view-folder"></div>);
 
 		return (
 			<div className="tree-view" onClick={this.handleClick}>

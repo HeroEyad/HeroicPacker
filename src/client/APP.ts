@@ -312,13 +312,38 @@ class APP {
 		};
 	}
 
+	private exportedSpriteNames(sheets: ReadonlyArray<ReadonlyArray<Rect>>) {
+		const removeFileExtension = this.packOptions.removeFileExtension ?? true;
+		const prependFolderName = this.packOptions.prependFolderName ?? true;
+		const names = new Map<string, string>();
+
+		for (const sheet of sheets) {
+			for (const rect of sheet) {
+				const file = rect.originalFile || rect.file;
+				if (!file) continue;
+
+				const base = file.split("/").pop() as string;
+				const dot = base.lastIndexOf(".");
+				const bare = dot > 0 ? base.substring(0, dot) : base;
+				const exported = exportedName(file, removeFileExtension, prependFolderName);
+
+				if (exported !== bare && !names.has(bare)) names.set(bare, exported);
+				if (exported !== base && !names.has(base)) names.set(base, exported);
+			}
+		}
+
+		return names;
+	}
+
 	getPackedAnimation(withAnimationOffsets:boolean = true) {
 		const animation = this.api.getAnimation();
 		if (!animation || !this.packResult) return null;
 
-		const spriteOffsets = getPackedSpriteOffsets(this.packResult.map(sheet => sheet.data));
+		const sheets = this.packResult.map(sheet => sheet.data);
+		const spriteOffsets = getPackedSpriteOffsets(sheets);
+		const renames = withAnimationOffsets ? this.exportedSpriteNames(sheets) : undefined;
 
-		return transformAnimationJson(animation.data, this.packScale, spriteOffsets, withAnimationOffsets ? this.api.getAnimationOffsets() : undefined);
+		return transformAnimationJson(animation.data, this.packScale, spriteOffsets, withAnimationOffsets ? this.api.getAnimationOffsets() : undefined, renames);
 	}
 }
 

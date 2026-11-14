@@ -2,15 +2,17 @@ import CustomImage from "../data/CustomImage";
 import type { LoadedImages } from "api/types";
 import TypedObserver from "TypedObserver";
 import I18 from "../locale/I18";
+import APP from "../APP";
 import { Observer, GLOBAL_EVENT } from "../Observer";
 import { getDummyRect } from "api/utils/common";
 import { readFla } from "./AdobleFLAReader";
-import { FlaRenderer, listSymbols, type FlaSymbolInfo } from "./FlaRenderer";
+import { FlaRenderer, listSymbols, type FlaSymbolInfo, type RenderedTimeline } from "./FlaRenderer";
+import { animationLabelNames, appendAnimations, buildFlaAnimation, spriteNames, type FlaAnimationResult } from "./FlaAnimation";
 
 export interface FlaImportRequest {
     fileName: string;
     symbols: FlaSymbolInfo[];
-    resolve: (ids: string[] | null) => void;
+    resolve: (ids: string[] | null, asAnimation?: boolean) => void;
 }
 
 const minDigits = 4;
@@ -27,6 +29,16 @@ function pickName(info: FlaSymbolInfo, used: Set<string>) {
     return /\d$/.test(name) ? name + "_" : name;
 }
 
+function pickLabel(info: FlaSymbolInfo, used: Set<string>) {
+    const base = (info.name.split("/").pop() || info.name).trim() || "animation";
+
+    let name = base;
+    for (let i = 2; used.has(name); i++) name = base + " " + i;
+
+    used.add(name);
+    return name;
+}
+
 export async function loadFlaFile(file: File, into: LoadedImages) {
     const doc = readFla(await file.arrayBuffer());
     const symbols = listSymbols(doc);
@@ -37,11 +49,15 @@ export async function loadFlaFile(file: File, into: LoadedImages) {
     }
 
     Observer.emit(GLOBAL_EVENT.HIDE_PROCESSING);
-    const ids = await new Promise<string[] | null>((resolve) => {
-        TypedObserver.flaImportRequested.emit({ fileName: file.name, symbols, resolve });
+    const choice = await new Promise<{ ids: string[]; asAnimation: boolean } | null>((resolve) => {
+        TypedObserver.flaImportRequested.emit({
+            fileName: file.name,
+            symbols,
+            resolve: (ids, asAnimation = true) => resolve(ids && ids.length ? { ids, asAnimation } : null)
+        });
     });
-    
-    if (!ids || !ids.length) return;
+
+    if (!choice) return;
 
     Observer.emit(GLOBAL_EVENT.SHOW_PROCESSING);
     await nextTick();
@@ -51,78 +67,60 @@ export async function loadFlaFile(file: File, into: LoadedImages) {
     const skipped: string[] = [];
     const decoding: Promise<void>[] = [];
 
-	// texture atlas part, ignore it because im still working on it... Unless someone's generous enough to help with assembling.
-    /*
-    const uniqueParts = new Set<string>();
-    for (const rawId of ids) {
-        const info = symbols.find((s: FlaSymbolInfo) => s.id === rawId || s.name === rawId);
-        if (!info) continue;
-        if (info.type === "bitmap") {
-            uniqueParts.add(info.name);
-        } else {
-            const tl = renderer.timelineOf(info.id);
-            if (tl) {
-                const nestedParts = renderer.getNestedSymbolNames(tl);
-                if (nestedParts.length > 0) {
-                    nestedParts.forEach((p) => uniqueParts.add(p));
-                } else {
-                    uniqueParts.add(info.name);
-                }
-            }
+    const current = APP.i.api.getAnimation();
+    const labels = new Set(animationLabelNames(current ? current.data : null));
+    const taken = spriteNames(current ? current.data : null);
+    const built: FlaAnimationResult[] = [];
+
+    const addImage = (name: string, url: string, size?: RenderedTimeline, duration?: number) => {
+        const image = new CustomImage(new Image());
+        image.src = url;
+        image.base64 = url;
+
+        if (size) {
+            image.rect = getDummyRect(name, size.width, size.height);
+            if (duration) image.rect.duration = duration;
         }
-    }
 
-    for (const partName of uniqueParts) {
-        let rendered = null;
-        try {
-            const isBitmap = Boolean(doc.bitmaps[partName]);
-            if (isBitmap) {
-                rendered = await renderer.renderBitmap(partName);
-            } else {
-                const tl = renderer.timelineOf("symbol:" + partName);
-                if (tl) {
-                    rendered = await renderer.renderTimeline(tl);
-                    if (rendered && rendered.frames.length > 0) {
-                        rendered.frames = [rendered.frames[0]];
-                    }
-                }
-            }
-        } catch (e) { console.error(e); }
-
-        if (!rendered || !rendered.frames.length) continue;
-
-        const cleanName = partName.split("/").pop() || partName;
-        const name = (used.has(cleanName) ? partName.replace(/\//g, "_") : cleanName) + ".png";
-        used.add(cleanName);
-
-        const frame = rendered.frames[0];
-        const nativeImage = new Image();
-        nativeImage.src = frame.url;
-
-        const image = new CustomImage(nativeImage, name, name, "");
-        image.src = frame.url;
-        image.base64 = frame.url;
-        image.image.src = frame.url;
-        image.rect = getDummyRect(name, rendered.width, rendered.height);
         into[name] = image;
+        decoding.push(image.image.decode().catch(() => {}));
+    };
 
-        decoding.push(nativeImage.decode().catch(() => {}));
-    }
-    */
-
-    for (const rawId of ids) {
-        const info = symbols.find((s: FlaSymbolInfo) => s.id === rawId || s.name === rawId);
+    for (const id of choice.ids) {
+        const info = symbols.find((s: FlaSymbolInfo) => s.id === id);
         if (!info) continue;
 
-        let rendered = null;
+        if (info.type !== "bitmap" && choice.asAnimation) {
+            const tl = renderer.timelineOf(info.id);
+            let result: FlaAnimationResult | null = null;
+
+            try {
+                if (tl) result = await buildFlaAnimation(doc, renderer, tl, info.name, pickLabel(info, labels), taken);
+            }
+            catch (e) {
+                console.error(e);
+            }
+
+            if (!result) {
+                skipped.push(info.name);
+                continue;
+            }
+
+            for (const part of result.parts) addImage(result.label + "/" + part.name + ".png", part.url);
+            built.push(result);
+
+            await nextTick();
+            continue;
+        }
+
+        let rendered: RenderedTimeline | null = null;
         try {
             if (info.type === "bitmap") {
                 rendered = await renderer.renderBitmap(info.name);
-            } else {
+            }
+            else {
                 const tl = renderer.timelineOf(info.id);
-                if (tl) {
-                    rendered = await renderer.renderTimeline(tl);
-                }
+                if (tl) rendered = await renderer.renderTimeline(tl);
             }
         }
         catch (e) {
@@ -137,25 +135,22 @@ export async function loadFlaFile(file: File, into: LoadedImages) {
         const base = pickName(info, used);
         const digits = Math.max(minDigits, (rendered.frames.length - 1).toString(10).length);
         const frameMs = 1000 / doc.fps;
+        const size = rendered;
 
-        rendered.frames.forEach((frame: { url: string; count: number }, index: number) => {
+        rendered.frames.forEach((frame, index) => {
             const name = base + index.toString(10).padStart(digits, "0") + ".png";
-            const nativeImage = new Image();
-            nativeImage.src = frame.url;
-
-            const image = new CustomImage(nativeImage, name, name, "");
-            image.src = frame.url;
-            image.base64 = frame.url;
-            image.image.src = frame.url;
-
-            image.rect = getDummyRect(name, rendered.width, rendered.height);
-            image.rect.duration = Math.round(frameMs * frame.count);
-
-            into[name] = image;
-            decoding.push(nativeImage.decode().catch(() => {}));
+            addImage(name, frame.url, size, Math.round(frameMs * frame.count));
         });
 
         await nextTick();
+    }
+
+    if (built.length) {
+        const baseName = file.name.replace(/\.[^.]+$/, "");
+        APP.i.api.setAnimation({
+            name: current ? current.name : baseName,
+            data: appendAnimations(current ? current.data : null, baseName, doc.fps, built)
+        });
     }
 
     await Promise.all(decoding);

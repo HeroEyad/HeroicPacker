@@ -18,6 +18,7 @@ import { animationKey } from 'api/utils/Character';
 import { frameName, frameNaming, replaceInOrder } from 'api/utils/FrameTiming';
 import { hasUnsavedChanges, markSaved, openProject } from '../Project';
 import { isProjectFile } from '../utils/ProjectFile';
+import { animationIsEmpty, animationLabelNames, removeAnimation } from '../utils/FlaAnimation';
 
 let INSTANCE:ImagesList;
 
@@ -477,7 +478,24 @@ class ImagesList extends React.Component<Props, State> {
 			if(this.state.images[key].selected) folder.selected = true;
 		}
 
+		const labels = animationLabelNames(APP.i.api.getAnimation()?.data ?? null);
+		for(const item of res.items) {
+			if(item.isFolder && labels.has(item.name)) item.isAnimation = true;
+		}
+
 		return res;
+	}
+
+	animationFolders = (names: string[]) => {
+		const labels = animationLabelNames(APP.i.api.getAnimation()?.data ?? null);
+		const found = new Set<string>();
+
+		for(const name of names) {
+			const slash = name.indexOf("/");
+			if(slash > 0 && labels.has(name.substring(0, slash))) found.add(name.substring(0, slash));
+		}
+
+		return found;
 	}
 
 	renameAnimation = (key: string, prefix: string) => {
@@ -607,6 +625,7 @@ class ImagesList extends React.Component<Props, State> {
 		let deletedCount = 0;
 
 		let keys = Object.keys(images);
+		const folders = this.animationFolders(keys);
 		for(let key of keys) {
 			if(images[key].selected) {
 				deletedCount++;
@@ -616,6 +635,15 @@ class ImagesList extends React.Component<Props, State> {
 
 		if(deletedCount > 0) {
 			images = this.sortImages(images);
+
+			const remaining = this.animationFolders(Object.keys(images));
+			const removed = Array.from(folders).filter(label => !remaining.has(label));
+			const animation = APP.i.api.getAnimation();
+			if(removed.length && animation) {
+				let data = animation.data;
+				for(const label of removed) data = removeAnimation(data, label);
+				APP.i.api.setAnimation(animationIsEmpty(data) ? null : { name: animation.name, data });
+			}
 
 			this.setState({images: images});
 			TypedObserver.imagesListChanged.emit(images);

@@ -11,12 +11,14 @@ interface Props {
 interface State {
     selected: ReadonlySet<string>;
     filter: string;
+    asAnimation: boolean;
 }
 
 class FlaImportDialog extends React.Component<Props, State> {
     override state: State = {
         selected: new Set(),
-        filter: ""
+        filter: "",
+        asAnimation: true
     };
 
     private done = false;
@@ -33,10 +35,10 @@ class FlaImportDialog extends React.Component<Props, State> {
         if (e.key === "Escape") this.cancel();
     }
 
-    finish = (ids: string[] | null) => {
+    finish = (ids: string[] | null, asAnimation: boolean = true) => {
         if (this.done) return;
         this.done = true;
-        this.props.request.resolve(ids);
+        this.props.request.resolve(ids, asAnimation);
     }
 
     cancel = () => {
@@ -46,7 +48,7 @@ class FlaImportDialog extends React.Component<Props, State> {
 
     confirm = () => {
         if (!this.state.selected.size) return;
-        this.finish(Array.from(this.state.selected));
+        this.finish(Array.from(this.state.selected), this.state.asAnimation);
         this.props.onClose();
     }
 
@@ -74,6 +76,10 @@ class FlaImportDialog extends React.Component<Props, State> {
         this.setState({ filter: e.target.value });
     }
 
+    onAsAnimation = () => {
+        this.setState({ asAnimation: !this.state.asAnimation });
+    }
+
     override render() {
         const count = this.state.selected.size;
 
@@ -97,6 +103,11 @@ class FlaImportDialog extends React.Component<Props, State> {
                             </label>
                         ))}
                     </div>
+
+                    <label className="fla-import-option" title={I18.f("FLA_IMPORT_AS_ANIMATION_TITLE")}>
+                        <input type="checkbox" checked={this.state.asAnimation} onChange={this.onAsAnimation} />
+                        <span>{I18.f("FLA_IMPORT_AS_ANIMATION")}</span>
+                    </label>
 
                     <div className="fla-import-buttons">
                         <div className="btn back-800 border-color-gray color-white" onClick={this.cancel}>{I18.f("CANCEL")}</div>

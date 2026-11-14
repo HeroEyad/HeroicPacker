@@ -7,9 +7,11 @@ import mustache from 'mustache';
 import * as appInfo from '../../../package.json';
 import TypedObserver from 'TypedObserver';
 
-const {
-	homepage: appHomepage
-} = appInfo;
+const { homepage: appHomepage } = appInfo;
+// why was it {
+// like this
+// } = hello?
+// prettify, hello?
 
 const STORAGE_CUSTOM_EXPORTER_KEY = "custom-exporter";
 

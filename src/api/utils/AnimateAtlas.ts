@@ -513,11 +513,11 @@ export function getPackedSpriteOffsets(sheets: ReadonlyArray<ReadonlyArray<Rect>
 	return offsets;
 }
 
-export function transformAnimationJson(data: string, scale: number, offsets?: ReadonlyMap<string, AnimationOffset>, labelOffsets?: ReadonlyMap<string, AnimationOffset>): string {
+export function transformAnimationJson(data: string, scale: number, offsets?: ReadonlyMap<string, AnimationOffset>, labelOffsets?: ReadonlyMap<string, AnimationOffset>, renames?: ReadonlyMap<string, string>): string {
 	const hasOffsets = hasAnyOffset(offsets);
 	const hasLabelOffsets = hasAnyOffset(labelOffsets);
 
-	if (scale === 1 && !hasOffsets && !hasLabelOffsets) return data;
+	if (scale === 1 && !hasOffsets && !hasLabelOffsets && !renames?.size) return data;
 
 	const json = parseAnimationJson(data);
 	if (!json) throw new Error("Invalid Animation.json");
@@ -527,6 +527,15 @@ export function transformAnimationJson(data: string, scale: number, offsets?: Re
 	const offsetOf = (name: string | null) => {
 		const offset = name !== null && hasOffsets ? offsets.get(name) : undefined;
 		return offset && (offset.x !== 0 || offset.y !== 0) ? offset : null;
+	};
+
+	const rename = (sprite: JsonObject) => {
+		const name = spriteName(sprite);
+		const renamed = name !== null && renames ? renames.get(name) : undefined;
+		if (renamed === undefined) return;
+
+		if (sprite.N !== undefined) sprite.N = renamed;
+		else sprite.name = renamed;
 	};
 
 	const visit = (node: Json, inFilters: boolean, inMeta: boolean) => {
@@ -562,27 +571,31 @@ export function transformAnimationJson(data: string, scale: number, offsets?: Re
 
 			visit(value, inFilters || FILTER_KEYS.has(key), META_KEYS.has(key));
 
-			if (!hasOffsets || !isObject(value)) continue;
+			if ((!hasOffsets && !renames) || !isObject(value)) continue;
 
 			if (SPRITE_KEYS.has(key)) {
 				const offset = offsetOf(spriteName(value));
 				if (offset && !translateLocal(value, offset.x, offset.y)) {
 					movePosition(value, offset.x, offset.y);
 				}
+				rename(value);
 			} else if (SYMBOL_KEYS.has(key)) {
 				const bitmap = getBitmap(value);
 				const offset = bitmap ? offsetOf(spriteName(bitmap)) : null;
-				if (!offset) continue;
 
-				if (translateLocal(value, offset.x, offset.y)) {
-					const pivot = value.TRP ?? value.transformationPoint;
-					if (isObject(pivot)) {
-						if (isNumber(pivot.x)) pivot.x = tidy(pivot.x - offset.x);
-						if (isNumber(pivot.y)) pivot.y = tidy(pivot.y - offset.y);
+				if (bitmap && offset) {
+					if (translateLocal(value, offset.x, offset.y)) {
+						const pivot = value.TRP ?? value.transformationPoint;
+						if (isObject(pivot)) {
+							if (isNumber(pivot.x)) pivot.x = tidy(pivot.x - offset.x);
+							if (isNumber(pivot.y)) pivot.y = tidy(pivot.y - offset.y);
+						}
+					} else {
+						movePosition(bitmap, offset.x, offset.y);
 					}
-				} else {
-					movePosition(bitmap, offset.x, offset.y);
 				}
+
+				if (bitmap) rename(bitmap);
 			}
 		}
 	};

@@ -30,7 +30,7 @@ export interface RenderedTimeline {
 const identity: Matrix = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
 const maxSize = 8192;
 
-const mul = (p: Matrix, c: Matrix): Matrix => ({
+export const mul = (p: Matrix, c: Matrix): Matrix => ({
     a: p.a * c.a + p.c * c.b,
     b: p.b * c.a + p.d * c.b,
     c: p.a * c.c + p.c * c.d,
@@ -323,7 +323,7 @@ export class FlaRenderer {
         return Array.from(parts);
     }
 
-    private async bitmap(name: string) {
+    async bitmap(name: string) {
         let pending = this.cache.get(name);
 
         if (!pending) {
@@ -498,6 +498,31 @@ export class FlaRenderer {
         }
 
         return { width, height, frames: out };
+    }
+
+    async renderShape(shape: ShapeElement) {
+        for (const fill of shape.fills) {
+            if (fill.type === "bitmap" && fill.bitmapPath) await this.bitmap(fill.bitmapPath);
+        }
+
+        const box = itemBox({ kind: "shape", m: identity, alpha: 1, shape });
+        if (!isFinite(box[0])) return null;
+
+        const x = Math.floor(box[0]) - 1;
+        const y = Math.floor(box[1]) - 1;
+        const width = Math.ceil(box[2]) + 1 - x;
+        const height = Math.ceil(box[3]) + 1 - y;
+        if (width > maxSize || height > maxSize) return null;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d")!;
+        ctx.translate(-x, -y);
+        this.drawShape(ctx, shape);
+
+        return { url: canvas.toDataURL("image/png"), x, y };
     }
 
     async renderBitmap(name: string): Promise<RenderedTimeline | null> {

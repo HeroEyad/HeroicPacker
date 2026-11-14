@@ -125,7 +125,12 @@ const opt = (v: string | undefined) => (v === undefined ? undefined : Number(v))
 const coord = (s: string) => {
   if (s[0] !== "#") return Number(s) / 20;
   const [whole, frac] = s.slice(1).split(".");
-  return ((parseInt(whole, 16) | 0) + (frac ? parseInt(frac, 16) / 256 : 0)) / 20;
+  // negative coords come as 24 bit signed hex like #FFF39F.27
+  let n = parseInt(whole, 16);
+  if (whole.length > 6) n |= 0;
+  else if (n >= 0x800000) n -= 0x1000000;
+  return (n + (frac ? parseInt(frac, 16) / Math.pow(16, frac.length) : 0)) / 20;
+  // idk how this was fixed but yeah, i am TOTALLY not freaking out rn
 };
 
 const parseEdgeString = (s: string): Segment[] => {

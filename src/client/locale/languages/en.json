@@ -10,8 +10,8 @@
 	"THEME_SYSTEM": "System",
 	"THEME_LIGHT": "Light",
 	"THEME_DARK": "Dark",
-	"ADD_IMAGES": "Add images",
-	"ADD_IMAGES_TITLE": "Add images",
+	"ADD_IMAGES": "Add images/Import FLA",
+	"ADD_IMAGES_TITLE": "Add images/Import FLA",
 	"ADD_ZIP": "Add ZIP",
 	"ADD_ZIP_TITLE": "Add zipped images",
 	"IMAGE_DROP_HELP": "or drag'n'drop images here",
@@ -253,5 +253,8 @@
 	"FLA_NO_SYMBOLS": "%s has no symbols or scenes with frames to import.",
 	"FLA_READ_ERROR": "Could not read %s. Only FLA files saved by Animate or Flash CS5 and newer are supported, older ones need to be resaved.",
 	"FLA_IMPORT_SKIPPED": "Nothing was imported for: %s (empty, or larger than 8192 px).",
-	"FLA_BITMAP_WARNING": "%s bitmap(s) could not be decoded and were left out."
+	"FLA_BITMAP_WARNING": "%s bitmap(s) could not be decoded and were left out.",
+	"FLA_IMPORT_AS_ANIMATION": "Import graphics as animations (a folder of parts)",
+	"FLA_IMPORT_AS_ANIMATION_TITLE": "Off: graphics are flattened into one image per frame instead",
+	"FLA_ANIMATION_FOLDER_TITLE": "Animation made of parts"
 }
