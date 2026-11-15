@@ -71,8 +71,8 @@ class MainHeader extends React.Component<{}, State> {
 		return (
 			<div className="main-header back-900 color-white">
 				<div className='left-align'>
-					<div className="main-header-app-name">
-						<img src="static/images/logo.png" alt="Logo" />
+					<div className="main-header-app-name" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+						<img src="static/images/logoBig.png" alt="Logo" style={{ height: 50, width: "auto", flexShrink: 0 }} />
 						{appDisplayName} {appVersion}
 					</div>
 
